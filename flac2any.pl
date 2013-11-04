@@ -7,9 +7,11 @@ use Audio::FLAC::Header;
 use Getopt::Long qw(GetOptions);
 use strict;
 
+# Default codec is ogg
 my $codec = 'ogg';
 my $result = GetOptions ("codec|format=s" => \$codec
                  );
+# There should be a usage message.
 exit unless $result;                 
 
 &verify_codec($codec) or
