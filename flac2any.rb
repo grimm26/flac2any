@@ -17,11 +17,11 @@ end.parse!
 
 begin
   if ARGV.length < 1
-    raise "We Have a problem."
+    raise "Please provide a format and a target directory or file."
   end
 rescue Exception => e
-  puts e.message
-  puts e.backtrace.inspect
+  STDERR.puts e.message
+  #STDERR.puts e.backtrace.inspect
 end
 
 flacs = ManipFlacs.new

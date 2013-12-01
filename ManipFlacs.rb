@@ -50,6 +50,11 @@ class ManipFlacs
           outfile = flac.sub(/flac$/, 'mp3')
           STDERR.puts "#{outfile}"
           cmd = %Q!#{lame} --quiet --noreplaygain -q2 -b 256 --cbr --ty "#{metaflac.tags['DATE']}" --ta "#{metaflac.tags['ARTIST']}" --tl "#{metaflac.tags['ALBUM']}" --tt "#{metaflac.tags['TITLE']}" --tn #{metaflac.tags['TRACKNUMBER']} --tg '#{metaflac.tags['GENRE']}' --id3v2-only  - #{outfile}!
+        when "m4a", "aac"
+          ffmpeg = which('ffmpeg')
+          outfile = flac.sub(/flac$/, 'm4a')
+          STDERR.puts "#{outfile}"
+          cmd = %Q!#{ffmpeg} -v fatal -i - -c:a libfdk_aac -vbr 4 -metadata title="#{metaflac.tags['TITLE']}" -metadata artist="#{metaflac.tags['ARTIST']}" -metadata date="#{metaflac.tags['DATE']}" -metadata album="#{metaflac.tags['ALBUM']}" -metadata tracknum=#{metaflac.tags['TRACKNUMBER']} -metadata genre="#{metaflac.tags['GENRE']}" #{outfile}!
         else
           raise "Unknown format #{format}"
         end
@@ -57,15 +62,19 @@ class ManipFlacs
       end
     rescue FlacInfoError => e
       STDERR.puts e.message
+      STDERR.puts e.backtrace.inspect
     rescue FlacInfoReadError => e
       STDERR.puts e.message
+      STDERR.puts e.backtrace.inspect
     rescue FlacCmdsError => e
       STDERR.print "Required command not found: "
       STDERR.puts e.message
+      STDERR.puts e.backtrace.inspect
     end
   end
 
   #   which('ruby') #=> /usr/bin/ruby
+  #   Should also check for supported features that we need, especially in ffmpeg
   def which(cmd)
     exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
     ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
