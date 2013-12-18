@@ -5,8 +5,11 @@ end
 
 class ManipFlacs
   attr_accessor :flacs
+  attr_reader :FORMATS
 
+  # Also find totaltracks
   FLAC_TAGS = ['ARTIST','ALBUM','TITLE','DATE','TRACKNUMBER','GENRE']
+  FORMATS   = ['ogg','m4a','aac','mp3']
 
   def initialize()
     @flacs = []
@@ -54,7 +57,7 @@ class ManipFlacs
           ffmpeg = which('ffmpeg')
           outfile = flac.sub(/flac$/, 'm4a')
           STDERR.puts "#{outfile}"
-          cmd = %Q!#{ffmpeg} -v fatal -i - -c:a libfdk_aac -vbr 4 -metadata title="#{metaflac.tags['TITLE']}" -metadata artist="#{metaflac.tags['ARTIST']}" -metadata date="#{metaflac.tags['DATE']}" -metadata album="#{metaflac.tags['ALBUM']}" -metadata tracknum=#{metaflac.tags['TRACKNUMBER']} -metadata genre="#{metaflac.tags['GENRE']}" #{outfile}!
+          cmd = %Q!#{ffmpeg} -v fatal -i - -c:a libfdk_aac -vbr 4 -metadata title="#{metaflac.tags['TITLE']}" -metadata artist="#{metaflac.tags['ARTIST']}" -metadata date="#{metaflac.tags['DATE']}" -metadata album="#{metaflac.tags['ALBUM']}" -metadata track=#{metaflac.tags['TRACKNUMBER']} -metadata genre="#{metaflac.tags['GENRE']}" #{outfile}!
         else
           raise "Unknown format #{format}"
         end
