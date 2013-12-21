@@ -7,7 +7,7 @@ class ManipFlacs
   attr_accessor :flacs
 
   def initialize()
-    @flacs = []
+    @flacs = Hash.new
   end
 
   def add_flacs(dirfile)
@@ -15,13 +15,13 @@ class ManipFlacs
       if File.directory?(dirfile)
         # Add the flacs in this dir to the @flacs array
         #@flacs.concat(Dir.glob("#{dirfile}/*.flac"))
-        Dir.glob("#{dirfile}/*.flac").each do |file|
-          @flacs << { name: file , tags: get_tags(file) }
+        Dir.glob("#{dirfile}/*.flac").sort.each do |file|
+         @flacs[file] = get_tags(file)
         end
       elsif File.file?(dirfile)
         # Add this file to the @flacs array
         #@flacs << dirfile
-        @flacs << { name: dirfile,  tags: get_tags(dirfile) }
+        @flacs[dirfile] = get_tags(dirfile)
       else
         raise "#{dirfile} is not a valid file or directory"
       end
@@ -33,10 +33,10 @@ class ManipFlacs
   def convert_to(format)
     begin
       flac_cmd = which('flac')
-      @flacs.sort_by {|e| e[:name]}.each do |h|
-        flac = h[:name]
-        tags = h[:tags]
+      @flacs.each do |flac,tags|
         STDERR.print "Encoding #{flac} into "
+        # Need to check that we have the tags we need.
+        # Use a lambda to set up args depending on format.
         case format 
         when "ogg"
           oggenc = which('oggenc')
